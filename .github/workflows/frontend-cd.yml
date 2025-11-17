@@ -1,4 +1,4 @@
-name: Frontend CD - Deploy to Vercel
+name: Frontend CD - Deploy to Netlify
 
 on:
   push:
@@ -21,25 +21,26 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'client/package-lock.json'
 
-      - name: Deploy with Vercel
+      - name: Build and Deploy to Netlify
         env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
         run: |
-          if [ -z "$VERCEL_TOKEN" ]; then
-            echo "Vercel credentials not configured."
-            echo "To enable automatic deployment to Vercel:"
-            echo "1. Create a project at vercel.com"
-            echo "2. Generate an API token"
-            echo "3. Add VERCEL_TOKEN, VERCEL_PROJECT_ID, VERCEL_ORG_ID as GitHub secrets"
+          if [ -z "$NETLIFY_AUTH_TOKEN" ] || [ -z "$NETLIFY_SITE_ID" ]; then
+            echo "Netlify credentials not configured."
+            echo "To enable automatic deployment to Netlify:"
+            echo "1. Create a site at netlify.com"
+            echo "2. Generate a personal access token"
+            echo "3. Add NETLIFY_AUTH_TOKEN and NETLIFY_SITE_ID as GitHub secrets"
+            echo "4. Install Netlify CLI and configure site"
           else
-            npm install -g vercel
+            npm install -g netlify-cli
             cd client
-            vercel --token $VERCEL_TOKEN --prod --build-env VITE_API_URL=${{ secrets.VITE_API_URL }}
+            netlify deploy --prod --site $NETLIFY_SITE_ID --auth $NETLIFY_AUTH_TOKEN
           fi
 
       - name: Deployment success
         run: |
           echo "Frontend deployment completed!"
-          echo "Check Vercel dashboard for live URL: https://vercel.com/dashboard"
+          echo "Check Netlify dashboard for live URL: https://app.netlify.com"
