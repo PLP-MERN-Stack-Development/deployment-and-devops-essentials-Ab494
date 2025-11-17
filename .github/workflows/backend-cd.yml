@@ -1,0 +1,41 @@
+name: Backend CD - Deploy to Render
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'server/**'
+      - '.github/workflows/backend-cd.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Render
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK" ]; then
+            echo "RENDER_DEPLOY_HOOK not set. Skipping deployment."
+            echo "To enable automatic deployment:"
+            echo "1. Create a service on Render.com"
+            echo "2. Get the Deploy Hook URL from service settings"
+            echo "3. Add RENDER_DEPLOY_HOOK secret to GitHub"
+          else
+            curl --no-buffer --remote-name -H "Content-Type: application/json" \
+              -d '{}' "$RENDER_DEPLOY_HOOK"
+          fi
+
+      - name: Verify deployment
+        run: |
+          echo "Backend deployment initiated. Monitor progress at: https://dashboard.render.com"
+
+      - name: Health check (after 30s delay)
+        run: |
+          sleep 30
+          if [ ! -z "${{ secrets.BACKEND_URL }}" ]; then
+            curl -f -I "${{ secrets.BACKEND_URL }}/api/health" || echo "Health check endpoint not yet available"
+          fi

@@ -1,0 +1,25 @@
+# Render.com deployment configuration
+# Save as render.yaml in your repository
+
+services:
+  - type: web
+    name: mern-backend
+    env: node
+    plan: free
+    buildCommand: cd server && npm install && npm run build
+    startCommand: cd server && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: MONGODB_URI
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: SENTRY_DSN
+        sync: false
+    routes:
+      - type: http
+        service: mern-backend
+        path: /

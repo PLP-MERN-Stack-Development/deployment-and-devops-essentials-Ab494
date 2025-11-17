@@ -1,0 +1,45 @@
+name: Frontend CD - Deploy to Vercel
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'client/**'
+      - '.github/workflows/frontend-cd.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+          cache-dependency-path: 'client/package-lock.json'
+
+      - name: Deploy with Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "Vercel credentials not configured."
+            echo "To enable automatic deployment to Vercel:"
+            echo "1. Create a project at vercel.com"
+            echo "2. Generate an API token"
+            echo "3. Add VERCEL_TOKEN, VERCEL_PROJECT_ID, VERCEL_ORG_ID as GitHub secrets"
+          else
+            npm install -g vercel
+            cd client
+            vercel --token $VERCEL_TOKEN --prod --build-env VITE_API_URL=${{ secrets.VITE_API_URL }}
+          fi
+
+      - name: Deployment success
+        run: |
+          echo "Frontend deployment completed!"
+          echo "Check Vercel dashboard for live URL: https://vercel.com/dashboard"

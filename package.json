@@ -1,0 +1,45 @@
+{
+  "name": "mern-deployment-devops",
+  "version": "1.0.0",
+  "description": "Production-ready MERN stack with CI/CD and monitoring (Vite + React + Tailwind)",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install && cd ..",
+    "dev": "concurrently --kill-others \"cd server && npm run dev\" \"cd client && npm run dev\"",
+    "dev:backend": "cd server && npm run dev",
+    "dev:frontend": "cd client && npm run dev",
+    "build": "cd client && npm run build && cd ../server && npm run build",
+    "build:client": "cd client && npm run build",
+    "build:server": "cd server && npm run build",
+    "test": "concurrently \"cd server && npm test\" \"cd client && npm test\"",
+    "test:server": "cd server && npm test",
+    "test:client": "cd client && npm test",
+    "lint": "concurrently \"cd server && npm run lint\" \"cd client && npm run lint\"",
+    "lint:fix": "concurrently \"cd server && npm run lint:fix\" \"cd client && npm run lint:fix\"",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
+  },
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "keywords": [
+    "mern",
+    "deployment",
+    "devops",
+    "cicd",
+    "docker",
+    "mongodb",
+    "vite",
+    "tailwind"
+  ],
+  "author": "PLP MERN Stack Development",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PLP-MERN-Stack-Development/deployment-and-devops-essentials-Ab494"
+  }
+}
